@@ -3,18 +3,35 @@ import librosa
 import numpy as np
 from tqdm import tqdm
 
-def load_audio_files(filepath: str, class_1_speakers: list):
+def load_audio_files(basePath: str,filepaths: list, class_1_speakers: list, name: str):
     audio_files = {
         'class_0': [],
-        'class_1': []
+        'class_1': [],
+        'test_class_0': [],
+        'test_class_1': []
         }
-    for file in os.listdir(filepath):
-        audio, _ = librosa.load(os.path.join(filepath, file),sr=None)
-        trimmed, _ = librosa.effects.trim(audio, top_db=20)
-        if(file.split('_')[0] in class_1_speakers):
-            audio_files['class_1'].append(trimmed)
-        else:
-            audio_files['class_0'].append(trimmed)
+    test_set = False
+    for filepath in filepaths:
+        absPath = os.path.join(basePath, filepath)
+        for file in os.listdir(absPath):
+            if file.split('_')[1] == name:
+                test_set = True
+
+            audio, _ = librosa.load(os.path.join(absPath, file),sr=None)
+            trimmed, _ = librosa.effects.trim(audio, top_db=20)
+
+            if(file.split('_')[0] in class_1_speakers):
+                if test_set:
+                    audio_files['test_class_1'].append(trimmed)
+                else: 
+                    audio_files['class_1'].append(trimmed)
+            else:
+                if test_set:
+                    audio_files['test_class_0'].append(trimmed)
+                else:
+                    audio_files['class_0'].append(trimmed)
+            test_set = False
+
     return audio_files
 
 def split_audio(sample_rate: str, audio,duration = 5.0, ):
@@ -30,7 +47,6 @@ def time_shift(sample_rate, audio, max_shift = 2.5):
 def generate_spectrograms(audio: dict[str, list], sample_rate: str , class_label, duration = 5.0, max_shift = 2.5, shifts = None):
     spectrograms = []
     for au in tqdm(audio[class_label],desc=f"Processing audio files of {class_label}"):
-
         to_split = [au]
         if shifts is not None:
             for _ in range(shifts):

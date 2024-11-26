@@ -1,2 +1,4 @@
 spectrograms/
 daps/
+wandb/
+__pycache__/

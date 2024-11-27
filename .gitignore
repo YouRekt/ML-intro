@@ -2,3 +2,4 @@ spectrograms/
 daps/
 wandb/
 __pycache__/
+spectrograms_old/

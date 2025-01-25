@@ -1,5 +1,5 @@
 params = {
-    "momentum": 0.8,
-    "learning_rate": 0.005,
+    "momentum": 0.9,
+    "learning_rate": 0.0001,
     "epochs": 5,
 }
